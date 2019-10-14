@@ -1,0 +1,21 @@
+{% extends "twitter_analysis/base.html" %}
+{% block content %}
+<article class="media content-section">
+    <div class="media-body">
+        <div class="article-metadata">
+            <a class="mr-2" href="#">{{ campaign.owner }}</a>
+            <small class="text-muted">{{ campaign.last_refreshed }}</small>
+            {% if campaign.owner == user %}
+            <div>
+                <a class="btn btn-outline-primary btn-sm mt-1 mb-1"
+                    href="{% url 'campaign-update' object.id %}">Update</a>
+                <a class="btn btn-outline-danger btn-sm mt-1 mb-1"
+                    href="{% url 'campaign-delete' object.id %}">Delete</a>
+            </div>
+            {% endif %}
+        </div>
+        <h2 class="article-title">{{ campaign.name }}</h2>
+        <p class="article-content">{{ campaign.description }}</p>
+    </div>
+</article>
+{% endblock content %}
