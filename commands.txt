@@ -1,3 +1,7 @@
+To create a new virtual environment 
+python3 -m pip install --user virtualenv
+python3 -m venv env
+
 To activate the venv:
 source env/bin/activate
 
