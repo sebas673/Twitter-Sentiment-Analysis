@@ -1,7 +1,7 @@
 # Twitter-Sentiment-Analysis
 Big Bucks No Whammies
 
-To start off you can create a new virtual environment in the same directory as this repository.<br/>
+To start off you can create a new virtual environment in the same directory as Twitter-Sentiment-Analysis.<br/>
 python3 -m pip install --user virtualenv<br/>
 python3 -m venv env
 
