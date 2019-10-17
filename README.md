@@ -11,7 +11,7 @@ source env/bin/activate
 To turn off venv:<br/>
 deactivate
 
-Once you're in the venv you can cd into django_project and download the requirements <br/>
+Once you're in the venv you can cd into Twitter-Sentiment-Analysis and download the requirements <br/>
 pip install -r requirements.txt
 
 The command to run the server is <br/>
