@@ -27,6 +27,8 @@ class Campaign(models.Model):
 
     def save(self, *args, **kwargs):
 
+        super().save(*args, **kwargs)
+
         # resultsN[0] is positive, resultsN[1] is negative, resultsN[2] is neutral
         results0 = sentiment_by_keyword(self.keyword0)
         self.positive_percent0 = results0[0]
