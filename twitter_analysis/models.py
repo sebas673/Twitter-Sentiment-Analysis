@@ -30,7 +30,8 @@ class Campaign(models.Model):
         super().save(*args, **kwargs)
 
         # resultsN[0] is positive, resultsN[1] is negative, resultsN[2] is neutral
-        results0 = sentiment_by_keyword(self.keyword0)
+        # results0 = sentiment_by_keyword(self.keyword0)
+        results0 = sentiment_by_keyword("trump")
         self.positive_percent0 = results0[0]
         self.negative_percent0 = results0[1]
         self.neutral_percent0 = results0[2]
