@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Campaign
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .sentiment import sentiment_by_keyword
 
 
 def home(request):
@@ -24,7 +25,7 @@ class CampaignDetailView(DetailView):
 
 class CampaignCreateView(LoginRequiredMixin, CreateView):
     model = Campaign
-    fields = ['name', 'description']
+    fields = ['name', 'description', 'keyword0']
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -33,7 +34,7 @@ class CampaignCreateView(LoginRequiredMixin, CreateView):
 
 class CampaignUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Campaign
-    fields = ['name', 'description']
+    fields = ['name', 'description', 'keyword0']
 
     def form_valid(self, form):
         form.instance.owner = self.request.user

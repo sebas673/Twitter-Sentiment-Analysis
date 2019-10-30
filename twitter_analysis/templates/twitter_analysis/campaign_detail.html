@@ -16,6 +16,10 @@
         </div>
         <h2 class="article-title">{{ campaign.name }}</h2>
         <p class="article-content">{{ campaign.description }}</p>
+        <p class="article-content">Keyword: {{ campaign.keyword0 }}</p>
+        <p class="article-content">Positive: {{ campaign.positive_percent0 }}%</p>
+        <p class="article-content">Negative: {{ campaign.negative_percent0 }}%</p>
+        <p class="article-content">Neutral: {{ campaign.neutral_percent0 }}%</p>
     </div>
 </article>
 {% endblock content %}
