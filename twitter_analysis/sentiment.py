@@ -63,18 +63,21 @@ class TwitterClient(object):
 
         try:
             # call twitter api to fetch tweets
-            fetched_tweets = self.api.search(q=query, count=count)
+            fetched_tweets = self.api.search(
+                q=query, count=count, tweet_mode='extended')
 
             # parsing tweets one by one
             for tweet in fetched_tweets:
+
+                print(type(tweet))
                 # empty dictionary to store required params of a tweet
                 parsed_tweet = {}
 
                 # saving text of tweet
-                parsed_tweet['text'] = tweet.text
+                parsed_tweet['text'] = tweet.full_text
                 # saving sentiment of tweet
                 parsed_tweet['sentiment'] = self.get_tweet_sentiment(
-                    tweet.text)
+                    tweet.full_text)
 
                 # appending parsed tweet to tweets list
                 if tweet.retweet_count > 0:
@@ -117,17 +120,18 @@ def sentiment_by_keyword(string):
     # percentage of neutral tweets
     neutralPercent = 100*(len(tweets) - len(ntweets) -
                           len(ptweets))/len(tweets)
-    # print("Neutral tweets percentage: {} %".format(negativePercent))
+
+    print("Neutral tweets percentage: {} %".format(negativePercent))
 
     # printing first 5 positive tweets
-    # print("\n\nPositive tweets:")
-    # for tweet in ptweets[:10]:
-    #     print(tweet['text'])
+    print("\n\nPositive tweets:")
+    for tweet in ptweets[:10]:
+        print(tweet['text'])
 
     # printing first 5 negative tweets
-    # print("\n\nNegative tweets:")
-    # for tweet in ntweets[:10]:
-    #     print(tweet['text'])
+    print("\n\nNegative tweets:")
+    for tweet in ntweets[:10]:
+        print(tweet['text'])
 
     return round(positivePercent), round(negativePercent), round(neutralPercent)
 
