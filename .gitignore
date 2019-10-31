@@ -4,6 +4,7 @@
 # personal
 commands.txt
 datadump.json
+settings.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

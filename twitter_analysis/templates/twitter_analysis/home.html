@@ -1,5 +1,18 @@
-{% extends "twitter_analysis/base.html" %}
-{% block content %}
+{% extends "twitter_analysis/sidebars.html" %}
+<!-- {% for campaign in campaigns %}
+<article class="media content-section">
+    <div class="media-body">
+        <div class="article-metadata">
+            <a class="mr-2" href="#">{{ campaign.owner }}</a>
+            <small class="text-muted">{{ campaign.last_refreshed }}</small>
+        </div>
+        <h2><a class="article-title" href="{% url 'campaign-detail' campaign.id %}">{{ campaign.name }}</a></h2>
+        <p class="article-content">{{ campaign.description }}</p>
+    </div>
+</article>
+{% endfor %} -->
+{% block components %}
+
 {% for campaign in campaigns %}
 <article class="media content-section">
     <div class="media-body">
@@ -12,4 +25,5 @@
     </div>
 </article>
 {% endfor %}
-{% endblock content %}
+
+{% endblock components %}
