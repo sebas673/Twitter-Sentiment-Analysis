@@ -3,6 +3,7 @@
 
 # personal
 commands.txt
+datadump.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
