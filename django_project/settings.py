@@ -21,10 +21,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '575a542638ac551b673460464b75699f5843d4f3881628f78e991b15458c581f'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = (os.environ.get('DEBUG_VALUE') == 'True')
 
 ALLOWED_HOSTS = ['tweepaign.herokuapp.com']
 
@@ -88,8 +88,8 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'renardkardhashi',
-        'USER': 'renardkardhashi',
+        'NAME': 'tweepaign_db',
+        'USER': 'sebas',
         'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '5432',
