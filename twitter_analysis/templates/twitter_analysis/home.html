@@ -14,16 +14,40 @@
 {% block components %}
 
 {% for campaign in campaigns %}
-<article class="media content-section">
-    <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="#">{{ campaign.owner }}</a>
-            <small class="text-muted">{{ campaign.last_refreshed }}</small>
+<div class="container-fluid">
+
+        <div class="row">
+          <div class="col-lg-6">
+
+            <!-- Basic Card Example -->
+            <div class="card shadow mb-4">
+                <div class="card border-left-success">
+                    <div class="card-header py-3">
+                      <h6 class="m-0 font-weight-bold text-success">
+                          <a href="{% url 'campaign-detail' campaign.id %}" class="text-success">{{ campaign.name }}</a>
+                        </h6>
+                    </div>
+                    <div class="card-body">{{ campaign.description }}</div>
+                </div>
+            </div>
+
+            <!-- Collapsable Card example...to be used later -->
+            <!-- <div class="card shadow mb-4">
+                <div class="card border-left-primary">
+                    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+                        <h6 class="m-0 font-weight-bold text-primary">{{ campaign.name }}</h6>
+                    </a>
+                    <div class="collapse show" id="collapseCardExample">
+                        <div class="card-body">{{ campaign.description }}</div>
+                    </div>
+                </div>
+            </div> -->
+
+
+          </div>
         </div>
-        <h2><a class="article-title" href="{% url 'campaign-detail' campaign.id %}">{{ campaign.name }}</a></h2>
-        <p class="article-content">{{ campaign.description }}</p>
-    </div>
-</article>
+
+</div>
 {% endfor %}
 
 {% endblock components %}
