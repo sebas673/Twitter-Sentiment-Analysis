@@ -19,6 +19,41 @@
   <!-- Custom styles for this template-->
   <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
 
+  <script type="application/javascript">
+    function draw_Pie(n1, n2, n3) {
+        var ctx = document.getElementById("myPieChart");
+        var myPieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+            labels: ["Positive", "Negative", "Neutral"],
+            datasets: [{
+                data: [n1, n2, n3],
+                backgroundColor: ['#3c62d1', '#ea4335', '#760684'],
+                hoverBackgroundColor: ['#3c62d1', '#ea4335', '#760684'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+            },
+            options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+            legend: {
+                display: false
+            },
+            cutoutPercentage: 80,
+            },
+        });
+    }
+  </script>
+
 </head>
 
 <body id="page-top">
