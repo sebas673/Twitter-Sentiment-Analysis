@@ -21,8 +21,9 @@
                         </div>
                         <form method="POST">
                                 {% csrf_token %}
+                                <hr>
                                 <fieldset class="form-group">
-                                    <legend class="border-bottom mb-4">Login</legend>
+                                    <!-- <legend class="border-bottom mb-4">Login</legend> -->
                                     {{ form|crispy }}
                                 </fieldset>
                                 <div class="form-group">

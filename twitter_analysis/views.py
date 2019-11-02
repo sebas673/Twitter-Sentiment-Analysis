@@ -25,7 +25,7 @@ class CampaignDetailView(DetailView):
 
 class CampaignCreateView(LoginRequiredMixin, CreateView):
     model = Campaign
-    fields = ['name', 'description', 'keyword0']
+    fields = ['name', 'keyword0', 'description']
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -34,7 +34,7 @@ class CampaignCreateView(LoginRequiredMixin, CreateView):
 
 class CampaignUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Campaign
-    fields = ['name', 'description', 'keyword0']
+    fields = ['name', 'keyword0', 'description']
 
     def form_valid(self, form):
         form.instance.owner = self.request.user

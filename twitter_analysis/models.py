@@ -9,12 +9,14 @@ from .sentiment import sentiment_by_keyword
 class Campaign(models.Model):
 
     # we'll need to add more fields eventually
-    name = models.CharField(max_length=100)
-    description = models.TextField()
+    name = models.CharField(max_length=100, verbose_name="Name")
+    description = models.TextField(
+        verbose_name="Notes")
     last_refreshed = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    keyword0 = models.CharField(max_length=50, default='')
+    keyword0 = models.CharField(
+        max_length=50, default='', verbose_name="Keywords")
     positive_percent0 = models.IntegerField(default=0)
     negative_percent0 = models.IntegerField(default=0)
     neutral_percent0 = models.IntegerField(default=0)
