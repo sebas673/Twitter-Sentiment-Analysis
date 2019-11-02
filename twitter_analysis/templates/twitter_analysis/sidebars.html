@@ -1,16 +1,4 @@
 {% extends "twitter_analysis/base.html" %}
-<!-- {% for campaign in campaigns %}
-<article class="media content-section">
-    <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="#">{{ campaign.owner }}</a>
-            <small class="text-muted">{{ campaign.last_refreshed }}</small>
-        </div>
-        <h2><a class="article-title" href="{% url 'campaign-detail' campaign.id %}">{{ campaign.name }}</a></h2>
-        <p class="article-content">{{ campaign.description }}</p>
-    </div>
-</article>
-{% endfor %} -->
 
 {% block side %}
 <!-- Sidebar -->
@@ -18,9 +6,9 @@
 
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'twitter_analysis-home' %}">
-          <div class="sidebar-brand-icon rotate-n-15">
+          <!-- <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
-          </div>
+          </div> -->
           <div class="sidebar-brand-text mx-3">Tweepaign</div>
         </a>
   
@@ -29,8 +17,8 @@
   
         <!-- Nav Item - Your Campaigns -->
         <li class="nav-item active">
-          <a class="nav-link" href="index.html">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
+          <a class="nav-link" href="{% url 'twitter_analysis-home' %}">
+            <i class="fas fa-fw fa-th-list"></i>
             <span>Your Campaigns</span></a>
         </li>
   
