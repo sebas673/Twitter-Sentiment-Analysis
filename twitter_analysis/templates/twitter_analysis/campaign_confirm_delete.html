@@ -1,16 +1,42 @@
-{% extends "twitter_analysis/base.html" %}
-{% block content %}
-<div class="content-section">
-    <form method="POST">
-        {% csrf_token %}
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Delete Campaign</legend>
-            <h2>Are you sure you want to delete the campaign "{{ campaign.name }}"</h2>
-        </fieldset>
-        <div class="form-group">
-            <button class="btn btn-outline-danger" type="submit">Delete</button>
-            <a class="btn btn-outline-secondary" href="{% url 'campaign-detail' object.id %}">Cancel</a>
+{% extends "twitter_analysis/sidebars.html" %}
+{% load crispy_forms_tags %}
+{% block remove %}
+
+<body class="bg-gradient-primary">
+    <div class="container">
+
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-5 d-none d-lg-block bg-password-image"></div>
+                    <div class="col-lg-7">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Delete Campaign</h1>
+                            </div>
+                            <hr>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <fieldset class="form-group">
+                                    <h2>Are you sure you want to delete the campaign "{{ campaign.name }}" ?</h2>
+                                </fieldset>
+                                <div class="form-group">
+                                    <button class="btn btn-outline-danger" type="submit">Delete</button>
+                                    <a class="btn btn-outline-secondary"
+                                        href="{% url 'campaign-detail' object.id %}">Cancel</a>
+                                </div>
+                            </form>
+                            <hr>
+                            <!-- <div class="text-center">
+                                <a class="small" href="{% url 'login' %}">Already have an account? Login!</a>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
-</div>
-{% endblock content %}
+
+    </div>
+</body>
+{% endblock remove %}

@@ -7,7 +7,7 @@ from .sentiment import sentiment_by_keyword
 
 def home(request):
     context = {
-        'campaigns': Campaign.objects.filter(user=request.user)
+        'campaigns': Campaign.objects.all().filter(owner=user)
     }
     return render(request, 'twitter_analysis/home.html', context)
 
