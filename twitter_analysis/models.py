@@ -21,6 +21,9 @@ class Campaign(models.Model):
     negative_percent0 = models.IntegerField(default=0)
     neutral_percent0 = models.IntegerField(default=0)
 
+    posID0 = models.CharField(max_length=100, default='')
+    negID0 = models.CharField(max_length=100, default='')
+
     def __str__(self):
         return self.name
 
@@ -34,6 +37,9 @@ class Campaign(models.Model):
         self.positive_percent0 = results0[0]
         self.negative_percent0 = results0[1]
         self.neutral_percent0 = results0[2]
+
+        self.posID0 = results0[3][0]
+        self.negID0 = results0[4][0]
 
         print("keyword: ", self.keyword0)
         print("positive: ", self.positive_percent0)

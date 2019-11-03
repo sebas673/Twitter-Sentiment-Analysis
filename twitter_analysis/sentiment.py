@@ -69,7 +69,6 @@ class TwitterClient(object):
             # parsing tweets one by one
             for tweet in fetched_tweets:
 
-                print(type(tweet))
                 # empty dictionary to store required params of a tweet
                 parsed_tweet = {}
 
@@ -78,6 +77,9 @@ class TwitterClient(object):
                 # saving sentiment of tweet
                 parsed_tweet['sentiment'] = self.get_tweet_sentiment(
                     tweet.full_text)
+
+                # save the tweet id
+                parsed_tweet['id'] = tweet.id_str
 
                 # appending parsed tweet to tweets list
                 if tweet.retweet_count > 0:
@@ -123,17 +125,25 @@ def sentiment_by_keyword(string):
 
     print("Neutral tweets percentage: {} %".format(negativePercent))
 
+    pos_IDs = []
+    neg_IDs = []
     # printing first 5 positive tweets
     print("\n\nPositive tweets:")
-    for tweet in ptweets[:10]:
+    for tweet in ptweets[:2]:
         print(tweet['text'])
+        print(tweet['id'])
+        pos_IDs.append(tweet['id'])
+        print("P")
 
-    # printing first 5 negative tweets
+        # printing first 5 negative tweets
     print("\n\nNegative tweets:")
-    for tweet in ntweets[:10]:
+    for tweet in ntweets[:2]:
         print(tweet['text'])
+        print(tweet['id'])
+        neg_IDs.append(tweet['id'])
+        print("N")
 
-    return round(positivePercent), round(negativePercent), round(neutralPercent)
+    return round(positivePercent), round(negativePercent), round(neutralPercent), pos_IDs, neg_IDs
 
 
 def main():
