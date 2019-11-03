@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Campaign
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -13,7 +13,7 @@ def home(request):
         }
         return render(request, 'twitter_analysis/home.html', context)
     else:
-        return render(request, 'twitter_analysis/home.html')
+        return redirect('login')
 
 
 # class CampaignListView(ListView):
