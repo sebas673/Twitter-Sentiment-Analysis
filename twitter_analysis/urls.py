@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .views import (
-    CampaignListView,
+    #     CampaignListView,
     CampaignDetailView,
     CampaignCreateView,
     CampaignUpdateView,
@@ -9,7 +9,8 @@ from .views import (
 )
 
 urlpatterns = [
-    path('', CampaignListView.as_view(), name='twitter_analysis-home'),
+    #     path('', CampaignListView.as_view(), name='twitter_analysis-home'),
+    path('', views.home, name='twitter_analysis-home'),
     path('campaign/<int:pk>/', CampaignDetailView.as_view(),
          name='campaign-detail'),
     path('campaign/new/', CampaignCreateView.as_view(),

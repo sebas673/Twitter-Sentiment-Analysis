@@ -6,16 +6,20 @@ from .sentiment import sentiment_by_keyword
 
 
 def home(request):
-    context = {
-        'campaigns': Campaign.objects.all().filter(owner=user)
-    }
-    return render(request, 'twitter_analysis/home.html', context)
+    if request.user.is_authenticated:
+        user = request.user
+        context = {
+            'campaigns': Campaign.objects.all().filter(owner=user)
+        }
+        return render(request, 'twitter_analysis/home.html', context)
+    else:
+        return render(request, 'twitter_analysis/home.html')
 
 
-class CampaignListView(ListView):
-    model = Campaign
-    template_name = 'twitter_analysis/home.html'
-    context_object_name = 'campaigns'
+# class CampaignListView(ListView):
+#     model = Campaign
+#     template_name = 'twitter_analysis/home.html'
+#     context_object_name = 'campaigns'
 
 
 class CampaignDetailView(DetailView):
