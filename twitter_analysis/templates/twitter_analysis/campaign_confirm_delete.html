@@ -19,7 +19,7 @@
                             <form method="POST">
                                 {% csrf_token %}
                                 <fieldset class="form-group">
-                                    <h2>Are you sure you want to delete the campaign "{{ campaign.name }}" ?</h2>
+                                    <p>Are you sure you want to delete the campaign "{{ campaign.name }}" ?</p>
                                 </fieldset>
                                 <div class="form-group">
                                     <button class="btn btn-outline-danger" type="submit">Delete</button>

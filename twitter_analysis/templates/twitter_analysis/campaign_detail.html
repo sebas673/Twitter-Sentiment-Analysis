@@ -23,76 +23,175 @@
     </div>
 </article> -->
 
-<body onload="draw_Pie({{ campaign.positive_percent0 }}, {{ campaign.negative_percent0 }}, {{ campaign.neutral_percent0 }});">
+<body
+  onload="draw_Pie({{ campaign.positive_percent0 }}, {{ campaign.negative_percent0 }}, {{ campaign.neutral_percent0 }});">
   <div class="container-fluid">
 
-      <div class="row">
+    <div class="row">
 
-        <div class="col-xl-3 col-md-6 mb-4">
-          <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-              <div class="row no-gutters align-items-center">
-                <div class="col mr-2">
-                  <div class="h5 mb-0 font-weight-bold text-gray-800">{{ campaign.keyword0 }}</div>
-                </div>
-                <div class="col-auto">
-                  <i class="fas fa-search fa-2x text-gray-300"></i>
-                </div>
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ campaign.keyword0 }}</div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-search fa-2x text-gray-300"></i>
               </div>
             </div>
           </div>
         </div>
-
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-        
-        <!-- Update and Delete buttons -->
-        <a href="{% url 'campaign-update' object.id %}" class="btn btn-info btn-circle btn-lg">
-          <i class="fas fa-pencil-alt"></i>
-        </a>
-        &nbsp; &nbsp;
-        <a href="{% url 'campaign-delete' object.id %}" class="btn btn-danger btn-circle btn-lg">
-          <i class="fas fa-trash"></i>
-        </a>
-
       </div>
 
-      <div class="row">
-        <!-- <div class="col-xl-8 col-lg-7"> -->
-          <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-              <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">How do users feel?</h6>
-              </div>
-              <div class="card-body">
-                <div class="chart-pie pt-4">
-                  <canvas id="myPieChart"></canvas>
-                </div>
-                <hr>
-                <div class="m-0 font-weight-bold text-primary">
-                  {{ campaign.positive_percent0 }}% Positive
-                </div> 
-                <div class="m-0 font-weight-bold text-danger">
-                    {{ campaign.negative_percent0 }}% Negative
-                </div> 
-                <div class="m-0 font-weight-bold">
-                  <font color="#760684">
-                      {{ campaign.neutral_percent0 }}% Neutral
-                  </font>
-                </div> 
-              </div>
+      &nbsp; &nbsp;
+      <!-- Update and Delete buttons -->
+      <a href="{% url 'campaign-update' object.id %}" class="btn btn-info btn-circle btn-lg">
+        <i class="fas fa-pencil-alt"></i>
+      </a>
+      &nbsp; &nbsp;
+      <a href="{% url 'campaign-delete' object.id %}" class="btn btn-danger btn-circle btn-lg">
+        <i class="fas fa-trash"></i>
+      </a>
+
+    </div>
+
+    <div class="row">
+      <!-- User Sentiment Component -->
+      <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">How do users feel?</h6>
+          </div>
+          <div class="card-body">
+            <div class="chart-pie pt-4">
+              <canvas id="myPieChart"></canvas>
+            </div>
+            <hr>
+            <div class="m-0 font-weight-bold text-primary">
+              {{ campaign.positive_percent0 }}% Positive
+            </div>
+            <div class="m-0 font-weight-bold text-danger">
+              {{ campaign.negative_percent0 }}% Negative
+            </div>
+            <div class="m-0 font-weight-bold">
+              <font color="#760684">
+                {{ campaign.neutral_percent0 }}% Neutral
+              </font>
             </div>
           </div>
-        <!-- </div> -->
+        </div>
       </div>
+
+      <!-- Good Tweet Component -->
+      <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Positive Tweet</h6>
+          </div>
+          <div class="card-body">
+            <style>
+              #tweet {
+                width: 400px !important;
+              }
+
+              #tweet iframe {
+                border: none !important;
+                box-shadow: none !important;
+              }
+            </style>
+
+            <div id="tweet" tweetID="{{campaign.posID0}}"></div>
+
+            <script sync src="https://platform.twitter.com/widgets.js"></script>
+
+            <script>
+
+              // window.onload = (function () {
+
+              var tweet = document.getElementById("tweet");
+              var id = tweet.getAttribute("tweetID");
+
+              twttr.widgets.createTweet(
+                id, tweet,
+                {
+                  conversation: 'none',    // or all
+                  cards: 'hidden',  // or visible 
+                  linkColor: '#cc0000', // default is blue
+                  theme: 'light'    // or dark
+                })
+                .then(function (el) {
+                  el.contentDocument.querySelector(".footer").style.display = "none";
+                })
+                .then(done);
+
+              // });
+
+            </script>
+
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bad Tweet Component -->
+      <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Negative Tweet</h6>
+          </div>
+          <div class="card-body">
+            <style>
+              #tweet {
+                width: 400px !important;
+              }
+
+              #tweet iframe {
+                border: none !important;
+                box-shadow: none !important;
+              }
+            </style>
+
+            <div id="tweet2" tweetID="{{campaign.negID0}}"></div>
+
+            <script sync src="https://platform.twitter.com/widgets.js"></script>
+
+            <script>
+
+              // window.onload = (function () {
+
+              var tweet = document.getElementById("tweet2");
+              var id = tweet.getAttribute("tweetID");
+
+              twttr.widgets.createTweet(
+                id, tweet,
+                {
+                  conversation: 'none',    // or all
+                  cards: 'hidden',  // or visible 
+                  linkColor: '#cc0000', // default is blue
+                  theme: 'light'    // or dark
+                })
+                .then(function (el) {
+                  el.contentDocument.querySelector(".footer").style.display = "none";
+                })
+                .then(done);
+
+                      // });
+
+            </script>
+
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
 
   </div>
 </body>
+
 
 
 
