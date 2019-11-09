@@ -29,6 +29,10 @@ class TwitterClient(object):
             self.auth.set_access_token(access_token, access_token_secret)
             # create tweepy API object to fetch tweets
             self.api = tweepy.API(self.auth)
+
+            # data = self.api.rate_limit_status()
+            # print(data)
+
         except:
             print("Error: Authentication Failed")
 

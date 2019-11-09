@@ -315,6 +315,14 @@
 </nav>
 <!-- End of Topbar -->
 
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">
+  {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
 <!-- Update Profile Form -->
 {% block profile %}{% endblock profile %}
 
