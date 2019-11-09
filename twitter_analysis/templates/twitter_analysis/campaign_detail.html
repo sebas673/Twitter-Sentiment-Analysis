@@ -1,30 +1,7 @@
 {% extends "twitter_analysis/sidebars.html" %}
 {% block components %}
-<!-- <article class="media content-section">
-    <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="#">{{ campaign.owner }}</a>
-            <small class="text-muted">{{ campaign.last_refreshed }}</small>
-            {% if campaign.owner == user %}
-            <div>
-                <a class="btn btn-outline-primary btn-sm mt-1 mb-1"
-                    href="{% url 'campaign-update' object.id %}">Update</a>
-                <a class="btn btn-outline-danger btn-sm mt-1 mb-1"
-                    href="{% url 'campaign-delete' object.id %}">Delete</a>
-            </div>
-            {% endif %}
-        </div>
-        <h2 class="article-title">{{ campaign.name }}</h2>
-        <p class="article-content">{{ campaign.description }}</p>
-        <p class="article-content">Keyword: {{ campaign.keyword0 }}</p>
-        <p class="article-content">Positive: {{ campaign.positive_percent0 }}%</p>
-        <p class="article-content">Negative: {{ campaign.negative_percent0 }}%</p>
-        <p class="article-content">Neutral: {{ campaign.neutral_percent0 }}%</p>
-    </div>
-</article> -->
 
-<body
-  onload="draw_Pie({{ campaign.positive_percent0 }}, {{ campaign.negative_percent0 }}, {{ campaign.neutral_percent0 }});">
+<body onload="draw_Pie({{ campaign.positive_percent0 }}, {{ campaign.negative_percent0 }}, {{ campaign.neutral_percent0 }});">
   <div class="container-fluid">
 
     <div class="row">
@@ -87,7 +64,7 @@
       <div class="col-xl-4 col-lg-5">
         <div class="card shadow mb-4">
           <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Good Tweet</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Positive Tweets</h6>
           </div>
           <div class="card-body">
             <style>
@@ -106,9 +83,6 @@
             <script sync src="https://platform.twitter.com/widgets.js"></script>
 
             <script>
-
-
-
               var tweet = document.getElementById("tweet1");
               var id = tweet.getAttribute("tweetID");
 
@@ -124,11 +98,11 @@
                   el.contentDocument.querySelector(".footer").style.display = "none";
                 })
                 .then(done);
-
-
-
             </script>
 
+            <div class="text-left">
+              <a class="small" href="{% url 'register' %}">See More ...</a>
+            </div>
 
           </div>
         </div>
@@ -139,7 +113,7 @@
       <div class="col-xl-4 col-lg-5">
         <div class="card shadow mb-4">
           <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Negative Tweet</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Negative Tweets</h6>
           </div>
           <div class="card-body">
             <style>
@@ -158,9 +132,6 @@
             <script sync src="https://platform.twitter.com/widgets.js"></script>
 
             <script>
-
-
-
               var tweet = document.getElementById("tweet2");
               var id = tweet.getAttribute("tweetID");
 
@@ -176,11 +147,11 @@
                   el.contentDocument.querySelector(".footer").style.display = "none";
                 })
                 .then(done);
-
-
-
             </script>
 
+            <div class="text-left">
+              <a class="small" href="{% url 'register' %}">See More ...</a>
+            </div>
 
           </div>
         </div>
@@ -188,6 +159,7 @@
       </div>
 
     </div>
+    <!-- End of row... -->
 
   </div>
 </body>
