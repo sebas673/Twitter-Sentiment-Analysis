@@ -16,10 +16,11 @@ def home(request):
         return redirect('login')
 
 
-# class CampaignListView(ListView):
-#     model = Campaign
-#     template_name = 'twitter_analysis/home.html'
-#     context_object_name = 'campaigns'
+class CampaignListView(ListView):
+    model = Campaign
+    # template_name = 'twitter_analysis/campaign_see_more.html'
+    template_name = 'twitter_analysis/campaign_see_more.html'
+    context_object_name = 'campaigns'
 
 
 class CampaignDetailView(DetailView):

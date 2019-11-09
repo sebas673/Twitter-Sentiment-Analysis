@@ -58,7 +58,7 @@ class TwitterClient(object):
         else:
             return 'negative'
 
-    def get_tweets(self, query, count=10):
+    def get_tweets(self, query, count):
         '''
         Main function to fetch tweets and parse them.
         '''
@@ -72,6 +72,8 @@ class TwitterClient(object):
 
             # parsing tweets one by one
             for tweet in fetched_tweets:
+
+                print("i")
 
                 # empty dictionary to store required params of a tweet
                 parsed_tweet = {}
@@ -102,12 +104,12 @@ class TwitterClient(object):
 
 
 # returns a tuple consisting of postive %, negative %, and neutral % (in that order)
-def sentiment_by_keyword(string):
+def sentiment_by_keyword(string, numTweets):
 
     # creating object of TwitterClient Class
     api = TwitterClient()
     # calling function to get tweets
-    tweets = api.get_tweets(query=string, count=200)
+    tweets = api.get_tweets(query=string, count=numTweets)
 
     # picking positive tweets from tweets
     ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
@@ -127,12 +129,13 @@ def sentiment_by_keyword(string):
     neutralPercent = 100*(len(tweets) - len(ntweets) -
                           len(ptweets))/len(tweets)
 
-    print("Neutral tweets percentage: {} %".format(negativePercent))
+    # print("Neutral tweets percentage: {} %".format(negativePercent))
 
     pos_IDs = []
     neg_IDs = []
     # printing first 5 positive tweets
     print("\n\nPositive tweets:")
+    print("num: ", len(ptweets))
     for tweet in ptweets[:2]:
         print(tweet['text'])
         print(tweet['id'])
@@ -141,8 +144,9 @@ def sentiment_by_keyword(string):
 
         # printing first 5 negative tweets
     print("\n\nNegative tweets:")
+    print("num: ", len(ntweets))
     for tweet in ntweets[:2]:
-        print(tweet['text'])
+        # print(tweet['text'])
         print(tweet['id'])
         neg_IDs.append(tweet['id'])
         print("N")
@@ -152,7 +156,7 @@ def sentiment_by_keyword(string):
 
 def main():
 
-    results = sentiment_by_keyword("trump")
+    results = sentiment_by_keyword("trump", 10)
     print("positive: ", results[0])
     print("negative: ", results[1])
     print("neutral: ", results[2])
