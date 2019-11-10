@@ -25,7 +25,10 @@ class Campaign(models.Model):
     posID0 = models.CharField(max_length=100, default='')
     negID0 = models.CharField(max_length=100, default='')
 
-    # posIDs = ArrayField(models.CharField(max_length=100))
+    posIDs = ArrayField(models.CharField(
+        max_length=100, default=''), null=True)
+    negIDs = ArrayField(models.CharField(
+        max_length=100, default=''), null=True)
 
     def __str__(self):
         return self.name
@@ -36,16 +39,49 @@ class Campaign(models.Model):
     def save(self, *args, **kwargs):
 
         # resultsN[0] is positive, resultsN[1] is negative, resultsN[2] is neutral
-        numTweets = 10
+        numTweets = 30
         results0 = sentiment_by_keyword(self.keyword0, numTweets)
         self.positive_percent0 = results0[0]
         self.negative_percent0 = results0[1]
         self.neutral_percent0 = results0[2]
 
-        self.posID0 = results0[3][0]
-        self.negID0 = results0[4][0]
+        if len(results0[3]) != 0:
+            self.posID0 = results0[3][0]
 
-        # for tweet in results0[3]:
+        if len(results0[4]) != 0:
+            self.negID0 = results0[4][0]
+
+        # add new PositiveIDs to the ArrayField
+        listPos = self.posIDs
+        # print(type(listPos))
+        if listPos is None:
+            # print("&&&&&&&&&&")
+            self.posIDs = results0[3]
+
+        else:
+            # print("listPost len before: ", len(listPos))
+            # print("len additions: ", len(results0[3]))
+            listPos += results0[3]
+            # print("listPost len after: ", len(listPos))
+            # print(listPos)
+            self.posIDs = listPos
+
+        #
+        # add new NegativeIDs to the ArrayField
+        listNeg = self.negIDs
+        # print(type(listNeg))
+        if listNeg is None:
+            # print("##########")
+            # print(results0[4])
+            self.negIDs = results0[4]
+
+        else:
+            # print("listNeg len before: ", len(listNeg))
+            # print("len additions: ", len(results0[4]))
+            listNeg += results0[4]
+            # print("listNeg len after: ", len(listNeg))
+            # print(listNeg)
+            self.NegIDs = listNeg
 
         print("keyword: ", self.keyword0)
         print("positive: ", self.positive_percent0)
