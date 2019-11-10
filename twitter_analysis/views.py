@@ -27,9 +27,9 @@ class CampaignListView(ListView):
         context = super().get_context_data(**kwargs)
         campaign = Campaign.objects.get(id=pk)
 
-        # print("campaign: ", campaign)
-        # print(campaign.posIDs)
-        # print(campaign.negIDs)
+        print("campaign: ", campaign)
+        print(campaign.posIDs)
+        print(campaign.negIDs)
 
         print("numPos tweets: ", len(campaign.posIDs))
         print("numNeg tweets: ", len(campaign.negIDs))

@@ -22,8 +22,8 @@ class Campaign(models.Model):
     negative_percent0 = models.IntegerField(default=0)
     neutral_percent0 = models.IntegerField(default=0)
 
-    posID0 = models.CharField(max_length=100, default='')
-    negID0 = models.CharField(max_length=100, default='')
+    posID0 = models.CharField(max_length=70, default='')
+    negID0 = models.CharField(max_length=70, default='')
 
     posIDs = ArrayField(models.CharField(
         max_length=100, default=''), null=True)
