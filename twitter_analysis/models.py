@@ -11,13 +11,15 @@ class Campaign(models.Model):
 
     # we'll need to add more fields eventually
     name = models.CharField(max_length=100, verbose_name="Name")
-    description = models.TextField(
-        verbose_name="Notes")
+    description = models.TextField(verbose_name="Notes")
     last_refreshed = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     keyword0 = models.CharField(
         max_length=50, default='', verbose_name="Keywords")
+
+    old_keyword = models.CharField(max_length=50, default='')
+
     positive_percent0 = models.IntegerField(default=0)
     negative_percent0 = models.IntegerField(default=0)
     neutral_percent0 = models.IntegerField(default=0)
@@ -45,17 +47,25 @@ class Campaign(models.Model):
         self.negative_percent0 = results0[1]
         self.neutral_percent0 = results0[2]
 
+        print("the new keyword is", self.keyword0)
+
         if len(results0[3]) != 0:
             self.posID0 = results0[3][0]
 
         if len(results0[4]) != 0:
             self.negID0 = results0[4][0]
 
-        # add new PositiveIDs to the ArrayField
-        listPos = self.posIDs
+        if self.old_keyword != self.keyword0:
+            listPos = []
+            print("pos not match")
+
+        else:
+            # add new PositiveIDs to the ArrayField
+            listPos = self.posIDs
+
         # print(type(listPos))
         if listPos is None:
-            # print("&&&&&&&&&&")
+            print("&&&&&&&&&&")
             self.posIDs = results0[3]
 
         else:
@@ -63,15 +73,21 @@ class Campaign(models.Model):
             # print("len additions: ", len(results0[3]))
             listPos += results0[3]
             # print("listPost len after: ", len(listPos))
-            # print(listPos)
+            print("pos: ", listPos)
             self.posIDs = listPos
 
-        #
-        # add new NegativeIDs to the ArrayField
-        listNeg = self.negIDs
+        if self.old_keyword != self.keyword0:
+            listNeg = []
+            self.old_keyword = self.keyword0
+            print("neg not match and clear")
+
+        else:
+            # add new NegativeIDs to the ArrayField
+            listNeg = self.negIDs
+
         # print(type(listNeg))
         if listNeg is None:
-            # print("##########")
+            print("##########")
             # print(results0[4])
             self.negIDs = results0[4]
 
@@ -80,14 +96,14 @@ class Campaign(models.Model):
             # print("len additions: ", len(results0[4]))
             listNeg += results0[4]
             # print("listNeg len after: ", len(listNeg))
-            # print(listNeg)
-            self.NegIDs = listNeg
+            print("negL ", listNeg)
+            self.negIDs = listNeg
 
-        print("keyword: ", self.keyword0)
-        print("positive: ", self.positive_percent0)
-        print("negative: ", self.negative_percent0)
-        print("neutral: ", self.neutral_percent0)
-        print("total: ", self.positive_percent0 +
-              self.negative_percent0 + self.neutral_percent0)
+        # print("keyword: ", self.keyword0)
+        # print("positive: ", self.positive_percent0)
+        # print("negative: ", self.negative_percent0)
+        # print("neutral: ", self.neutral_percent0)
+        # print("total: ", self.positive_percent0 +
+        #       self.negative_percent0 + self.neutral_percent0)
 
         super().save(*args, **kwargs)
