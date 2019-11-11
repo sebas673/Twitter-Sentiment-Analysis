@@ -20,7 +20,24 @@ class CampaignListView(ListView):
     model = Campaign
     # template_name = 'twitter_analysis/campaign_see_more.html'
     template_name = 'twitter_analysis/campaign_see_more.html'
-    context_object_name = 'campaigns'
+    # context_object_name = 'campaigns'
+
+    def get_context_data(self, **kwargs):
+        pk = self.kwargs['pk']
+        context = super().get_context_data(**kwargs)
+        campaign = Campaign.objects.get(id=pk)
+
+        print("campaign: ", campaign)
+        print(campaign.posIDs)
+        print(campaign.negIDs)
+
+        print("numPos tweets: ", len(campaign.posIDs))
+        print("numNeg tweets: ", len(campaign.negIDs))
+
+        context['posIDs'] = campaign.posIDs
+        context['negIDs'] = campaign.negIDs
+
+        return context
 
 
 class CampaignDetailView(DetailView):
