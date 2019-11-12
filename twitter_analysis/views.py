@@ -36,6 +36,7 @@ class CampaignListView(ListView):
 
         context['posIDs'] = campaign.posIDs
         context['negIDs'] = campaign.negIDs
+        context['keyword'] = campaign.keyword0
 
         return context
 

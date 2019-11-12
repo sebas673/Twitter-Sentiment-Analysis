@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-from .sentiment import sentiment_by_keyword
+from .sentiment import sentiment_by_keyword, sentiment_by_time
 from django.contrib.postgres.fields import ArrayField
 # The Campaign Model is a user's virtual campaign
 # A user can have many Campaigns, but each Campaign only has one owner
@@ -30,6 +30,11 @@ class Campaign(models.Model):
     posIDs = ArrayField(models.CharField(
         max_length=100, default=''), null=True)
     negIDs = ArrayField(models.CharField(
+        max_length=100, default=''), null=True)
+
+    times = ArrayField(models.CharField(
+        max_length=100, default=''), null=True)
+    polarities = ArrayField(models.CharField(
         max_length=100, default=''), null=True)
 
     def __str__(self):
@@ -105,5 +110,9 @@ class Campaign(models.Model):
         # print("neutral: ", self.neutral_percent0)
         # print("total: ", self.positive_percent0 +
         #       self.negative_percent0 + self.neutral_percent0)
+
+        results_time = sentiment_by_time(self.keyword0, numTweets)
+        self.times = results_time[0]
+        self.polarities = results_time[1]
 
         super().save(*args, **kwargs)
