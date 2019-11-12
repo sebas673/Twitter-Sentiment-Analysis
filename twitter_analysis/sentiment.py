@@ -43,22 +43,28 @@ class TwitterClient(object):
         '''
         return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t]) |(\w+:\/\/\S+)", " ", tweet).split())
 
-    def get_tweet_sentiment(self, tweet):
+    def get_tweet_sentiment(self, tweet, description):
         '''
         Utility function to classify sentiment of passed tweet
         using textblob's sentiment method
         '''
         # create TextBlob object of passed tweet text
         analysis = TextBlob(self.clean_tweet(tweet))
-        # set sentiment
-        if analysis.sentiment.polarity > 0:
-            return 'positive'
-        elif analysis.sentiment.polarity == 0:
-            return 'neutral'
-        else:
-            return 'negative'
+        polarity = analysis.sentiment.polarity
 
-    def get_tweets(self, query, count):
+        if description:
+            # set sentiment
+            if polarity > 0:
+                return 'positive'
+            elif polarity == 0:
+                return 'neutral'
+            else:
+                return 'negative'
+
+        else:
+            return polarity
+
+    def get_tweets(self, query, count, is_popular, description):
         '''
         Main function to fetch tweets and parse them.
         '''
@@ -66,9 +72,16 @@ class TwitterClient(object):
         tweets = []
 
         try:
-            # call twitter api to fetch tweets
-            fetched_tweets = self.api.search(
-                q=query, count=count, tweet_mode='extended')
+
+            if is_popular:
+                # call twitter api to fetch popular tweets
+                fetched_tweets = self.api.search(
+                    q=query, count=count, tweet_mode='extended', result_type='popular')
+
+            else:
+                # call twitter api to fetch recent tweets
+                fetched_tweets = self.api.search(
+                    q=query, count=count, tweet_mode='extended', result_type='recent')
 
             # parsing tweets one by one
             for tweet in fetched_tweets:
@@ -80,10 +93,17 @@ class TwitterClient(object):
                 parsed_tweet['text'] = tweet.full_text
                 # saving sentiment of tweet
                 parsed_tweet['sentiment'] = self.get_tweet_sentiment(
-                    tweet.full_text)
+                    tweet.full_text, description)
 
                 # save the tweet id
                 parsed_tweet['id'] = tweet.id_str
+
+                # save the time it was created at
+                parsed_tweet['time'] = tweet.created_at
+
+                print("time_created: ", tweet.created_at)
+                # print("tweet text", tweet)
+                print()
 
                 # appending parsed tweet to tweets list
                 if tweet.retweet_count > 0:
@@ -101,13 +121,42 @@ class TwitterClient(object):
             print("Error : " + str(e))
 
 
-# returns a tuple consisting of postive %, negative %, and neutral % (in that order)
-def sentiment_by_keyword(string, numTweets):
+def sentiment_by_time(string, numTweets):
+    '''returns a tuple consisting of postive %, negative %, and neutral % (in that order)'''
 
     # creating object of TwitterClient Class
     api = TwitterClient()
     # calling function to get tweets
-    tweets = api.get_tweets(query=string, count=numTweets)
+    tweets = api.get_tweets(query=string, count=numTweets,
+                            is_popular=True, description=False)
+
+    print("total num of tweets received", len(tweets))
+
+    dates = []
+    sentiment = []
+
+    # add positive polarity and time to lists
+    for tweet in tweets:
+        dates.append(tweet['time'])
+        sentiment.append(tweet['sentiment'])
+
+    # list1, list2 = zip(*sorted(zip(list1, list2)))
+
+    dates, sentiment = zip(*sorted(zip(dates, sentiment)))
+
+    return dates, sentiment
+
+
+def sentiment_by_keyword(string, numTweets):
+    '''returns a tuple consisting of postive %, negative %, and neutral % (in that order)'''
+
+    # creating object of TwitterClient Class
+    api = TwitterClient()
+    # calling function to get tweets
+    tweets = api.get_tweets(query=string, count=numTweets,
+                            is_popular=False, description=True)
+
+    print("total num of tweets received", len(tweets))
 
     # picking positive tweets from tweets
     ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
@@ -132,8 +181,7 @@ def sentiment_by_keyword(string, numTweets):
     pos_IDs = []
     neg_IDs = []
     # printing first 5 positive tweets
-    print("\n\nPositive tweets:")
-    print("numPos: ", len(ptweets))
+    print("number of positive tweets: ", len(ptweets))
     for tweet in ptweets[:3]:
         # print(tweet['text'])
         print(tweet['id'])
@@ -141,11 +189,10 @@ def sentiment_by_keyword(string, numTweets):
         # print("P")
 
         # printing first 5 negative tweets
-    print("\n\nNegative tweets:")
-    print("numNeg: ", len(ntweets))
+    print("number of negative tweets: ", len(ntweets))
     for tweet in ntweets[:3]:
         # print(tweet['text'])
-        print(tweet['id'])
+        # print(tweet['id'])
         neg_IDs.append(tweet['id'])
         # print("N")
 
@@ -154,11 +201,30 @@ def sentiment_by_keyword(string, numTweets):
 
 def main():
 
-    results = sentiment_by_keyword("trump", 10)
-    print("positive: ", results[0])
-    print("negative: ", results[1])
-    print("neutral: ", results[2])
-    print("total: ", results[0] + results[1] + results[2])
+    keyword = "trump"
+    count = 3
+    print("keyword: ", keyword)
+    print("number of tweets requested: ", count)
+    print()
+
+    # results = sentiment_by_keyword(keyword, count)
+    # print("positive: ", results[0])
+    # print("negative: ", results[1])
+    # print("neutral: ", results[2])
+    # print("total: ", results[0] + results[1] + results[2])
+
+    results_graph = sentiment_by_time(keyword, count)
+    print("dates: ", results_graph[0])
+    print()
+    print("sentiment: ", results_graph[1])
+
+    # print()
+    # print()
+    # new_dates, new_sentiment = zip(
+    #     *sorted(zip(results_graph[0], results_graph[1])))
+    # print("new_dates: ", new_dates)
+    # print()
+    # print("new_sentiment: ", new_sentiment)
 
 
 if __name__ == "__main__":
