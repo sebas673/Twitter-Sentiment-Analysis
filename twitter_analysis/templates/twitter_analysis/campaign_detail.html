@@ -1,9 +1,10 @@
 {% extends "twitter_analysis/sidebars.html" %}
 {% block components %}
 
-<body onload="draw_Pie({{ campaign.positive_percent0 }}, {{ campaign.negative_percent0 }}, {{ campaign.neutral_percent0 }});">
+<body onload="draw_Pie({{ campaign.positive_percent0 }}, {{ campaign.negative_percent0 }}, {{ campaign.neutral_percent0 }});
+              draw_Chart({{ campaign.times }}, {{ campaign.polarities }});">
   <div class="container-fluid">
-
+    <!-- Row 1 -->
     <div class="row">
 
       <div class="col-xl-3 col-md-6 mb-4">
@@ -32,7 +33,8 @@
       </a>
 
     </div>
-
+    
+    <!-- Row 2 -->
     <div class="row">
       <!-- User Sentiment Component -->
       <div class="col-xl-4 col-lg-5">
@@ -91,7 +93,7 @@
                 {
                   conversation: 'none',    // or all
                   cards: 'hidden',  // or visible 
-                  linkColor: '#cc0000', // default is blue
+                  linkColor: 'default', // default is blue
                   theme: 'light'    // or dark
                 })
                 .then(function (el) {
@@ -101,7 +103,7 @@
             </script>
 
             <div class="text-left">
-              <a class="small" href="{% url 'register' %}">See More ...</a>
+              <a class="small" href="{% url 'campaign-more' campaign.id %}">See More ...</a>
             </div>
 
           </div>
@@ -140,7 +142,7 @@
                 {
                   conversation: 'none',    // or all
                   cards: 'hidden',  // or visible 
-                  linkColor: '#cc0000', // default is blue
+                  linkColor: 'default', // default is blue
                   theme: 'light'    // or dark
                 })
                 .then(function (el) {
@@ -150,7 +152,7 @@
             </script>
 
             <div class="text-left">
-              <a class="small" href="{% url 'register' %}">See More ...</a>
+              <a class="small" href="{% url 'campaign-more' campaign.id %}">See More ...</a>
             </div>
 
           </div>
@@ -159,9 +161,80 @@
       </div>
 
     </div>
-    <!-- End of row... -->
+
+    <!-- Row 3 -->
+    <div class="row">
+
+        <div class="col-xl-8 col-lg-7">
+          <!-- Sentiment over Time Component -->
+            <div class="card shadow mb-4">
+              <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Sentiment over Time</h6>
+              </div>
+              <div class="card-body">
+                <div class="chart-area">
+                  <canvas id="myChart"></canvas>
+                </div>
+              </div>
+            </div>
+        </div>
+
+      <!-- Word Cloud-->
+      <!-- <div class="col-xl-8 col-lg-6">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Word Cloud</h6>
+          </div>
+          <div class="card-body">
+            <script>
+              anychart.onDocumentReady(function() {
+                var data = [
+                  {"x": "Mandarin chinese", "value": 1090000000, category: "Sino-Tibetan"},
+                  {"x": "English", "value": 983000000, category: "Indo-European"},
+                  {"x": "Hindustani", "value": 544000000, category: "Indo-European"},
+                  {"x": "Spanish", "value": 527000000, category: "Indo-European"},
+                  {"x": "Arabic", "value": 422000000, category: "Afro-Asiatic"},
+                  {"x": "Malay", "value": 281000000, category: "Austronesian"},
+                  {"x": "Russian", "value": 267000000, category: "Indo-European"},
+                  {"x": "Bengali", "value": 261000000, category: "Indo-European"},
+                  {"x": "Portuguese", "value": 229000000, category: "Indo-European"},
+                  {"x": "French", "value": 229000000, category: "Indo-European"},
+                  {"x": "Hausa", "value": 150000000, category: "Afro-Asiatic"},
+                  {"x": "Punjabi", "value": 148000000, category: "Indo-European"},
+                  {"x": "Japanese", "value": 129000000, category: "Japonic"},
+                  {"x": "German", "value": 129000000, category: "Indo-European"},
+                  {"x": "Persian", "value": 121000000, category: "Indo-European"}
+                  ];
+
+                // create a tag (word) cloud chart
+                var chart = anychart.tagCloud(data);
+
+                // set a chart title
+                chart.title('15 most spoken languages')
+                // set an array of angles at which the words will be laid out
+                chart.angles([0])
+                // enable a color range
+                chart.colorRange(true);
+                // set the color range length
+                chart.colorRange().length('80%');
+
+                // display the word cloud chart
+                chart.container("container");
+                chart.draw();
+              });
+            </script> -->
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+
 
   </div>
+
+
+    
 </body>
 
 
