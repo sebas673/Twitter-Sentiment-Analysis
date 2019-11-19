@@ -128,7 +128,7 @@ def sentiment_by_time(string, numTweets):
     api = TwitterClient()
     # calling function to get tweets
     tweets = api.get_tweets(query=string, count=numTweets,
-                            is_popular=True, description=False)
+                            is_popular=False, description=False)
 
     print("total num of tweets received", len(tweets))
 
@@ -154,7 +154,7 @@ def sentiment_by_keyword(string, numTweets):
     api = TwitterClient()
     # calling function to get tweets
     tweets = api.get_tweets(query=string, count=numTweets,
-                            is_popular=False, description=True)
+                            is_popular=True, description=True)
 
     print("total num of tweets received", len(tweets))
 
