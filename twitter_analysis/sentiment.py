@@ -8,7 +8,7 @@ from textblob import TextBlob
 
 class TwitterClient(object):
     '''
-    Generic Twitter Class for sentiment analysis.
+    Generic Twitter Class for polarities analysis.
     '''
 
     def __init__(self):
@@ -45,15 +45,15 @@ class TwitterClient(object):
 
     def get_tweet_sentiment(self, tweet, description):
         '''
-        Utility function to classify sentiment of passed tweet
-        using textblob's sentiment method
+        Utility function to classify polarities of passed tweet
+        using textblob's polarities method
         '''
         # create TextBlob object of passed tweet text
         analysis = TextBlob(self.clean_tweet(tweet))
         polarity = analysis.sentiment.polarity
 
         if description:
-            # set sentiment
+            # set polarities
             if polarity > 0:
                 return 'positive'
             elif polarity == 0:
@@ -83,14 +83,22 @@ class TwitterClient(object):
                 fetched_tweets = self.api.search(
                     q=query, count=count, tweet_mode='extended', result_type='recent')
 
+            highest = 0
+            highestID = ""
+
             # parsing tweets one by one
             for tweet in fetched_tweets:
+
+                if tweet.favorite_count > highest:
+                    highest = tweet.favorite_count
+                    highestID = tweet.id_str
 
                 # empty dictionary to store required params of a tweet
                 parsed_tweet = {}
 
                 # saving text of tweet
                 parsed_tweet['text'] = tweet.full_text
+
                 # saving sentiment of tweet
                 parsed_tweet['sentiment'] = self.get_tweet_sentiment(
                     tweet.full_text, description)
@@ -101,10 +109,6 @@ class TwitterClient(object):
                 # save the time it was created at
                 parsed_tweet['time'] = tweet.created_at
 
-                print("time_created: ", tweet.created_at)
-                # print("tweet text", tweet)
-                print()
-
                 # appending parsed tweet to tweets list
                 if tweet.retweet_count > 0:
                     # if tweet has retweets, ensure that it is appended only once
@@ -114,117 +118,91 @@ class TwitterClient(object):
                     tweets.append(parsed_tweet)
 
             # return parsed tweets
-            return tweets
+            return tweets, highestID
 
         except tweepy.TweepError as e:
             # print error (if any)
             print("Error : " + str(e))
 
 
-def sentiment_by_time(string, numTweets):
-    '''returns a tuple consisting of postive %, negative %, and neutral % (in that order)'''
+def sentiment_by_time(string, numTweetsRequested):
+    '''a list of times and a list of corresponding polarities'''
 
     # creating object of TwitterClient Class
     api = TwitterClient()
+
     # calling function to get tweets
-    tweets = api.get_tweets(query=string, count=numTweets,
+    tweets = api.get_tweets(query=string, count=numTweetsRequested,
                             is_popular=False, description=False)
 
-    print("total num of tweets received", len(tweets))
-
-    dates = []
-    sentiment = []
+    times = []
+    polarities = []
 
     # add positive polarity and time to lists
-    for tweet in tweets:
-        dates.append(tweet['time'])
-        sentiment.append(tweet['sentiment'])
+    for tweet in tweets[0]:
+        times.append(tweet['time'])
+        polarities.append(tweet['sentiment'])
 
-    # list1, list2 = zip(*sorted(zip(list1, list2)))
+    times, polarities = zip(*sorted(zip(times, polarities)))
 
-    dates, sentiment = zip(*sorted(zip(dates, sentiment)))
-
-    return dates, sentiment
+    return times, polarities
 
 
-def sentiment_by_keyword(string, numTweets):
-    '''returns a tuple consisting of postive %, negative %, and neutral % (in that order)'''
+def sentiment_by_keyword(string, numTweetsRequested):
+    '''
+    returns list of posIDs [0], negIDs [1], most favorited tweet [2], number of positive tweets [3], 
+    number of negative tweets [4], and total number of tweets [5]
+    '''
 
     # creating object of TwitterClient Class
     api = TwitterClient()
+
     # calling function to get tweets
-    tweets = api.get_tweets(query=string, count=numTweets,
+    tweets = api.get_tweets(query=string, count=numTweetsRequested,
                             is_popular=True, description=True)
 
-    print("total num of tweets received", len(tweets))
-
     # picking positive tweets from tweets
-    ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
+    ptweets = [tweet for tweet in tweets[0]
+               if tweet['sentiment'] == 'positive']
 
-    # percentage of positive tweets
-    positivePercent = 100*len(ptweets)/len(tweets)
-    # print("Positive tweets percentage: {} %".format(positivePercent))
-
-    # picking negative tweets from tweets
-    ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
-
-    # percentage of negative tweets
-    negativePercent = 100*len(ntweets)/len(tweets)
-    # print("Negative tweets percentage: {} %".format(negativePercent))
-
-    # percentage of neutral tweets
-    neutralPercent = 100*(len(tweets) - len(ntweets) -
-                          len(ptweets))/len(tweets)
-
-    # print("Neutral tweets percentage: {} %".format(negativePercent))
+    ntweets = [tweet for tweet in tweets[0]
+               if tweet['sentiment'] == 'negative']
 
     pos_IDs = []
     neg_IDs = []
-    # printing first 5 positive tweets
-    print("number of positive tweets: ", len(ptweets))
-    for tweet in ptweets[:3]:
-        # print(tweet['text'])
-        print(tweet['id'])
+
+    for tweet in ptweets:
         pos_IDs.append(tweet['id'])
-        # print("P")
 
-        # printing first 5 negative tweets
-    print("number of negative tweets: ", len(ntweets))
-    for tweet in ntweets[:3]:
-        # print(tweet['text'])
-        # print(tweet['id'])
+    for tweet in ntweets:
         neg_IDs.append(tweet['id'])
-        # print("N")
 
-    return round(positivePercent), round(negativePercent), round(neutralPercent), pos_IDs, neg_IDs
+    return pos_IDs, neg_IDs, tweets[1], len(ptweets), len(ntweets), len(tweets[0])
 
 
 def main():
 
     keyword = "trump"
     count = 3
-    print("keyword: ", keyword)
-    print("number of tweets requested: ", count)
-    print()
+
+    # print("keyword: ", keyword)
+    # print("number of tweets requested: ", count)
+    # print()
 
     # results = sentiment_by_keyword(keyword, count)
-    # print("positive: ", results[0])
-    # print("negative: ", results[1])
-    # print("neutral: ", results[2])
-    # print("total: ", results[0] + results[1] + results[2])
 
     results_graph = sentiment_by_time(keyword, count)
-    print("dates: ", results_graph[0])
+    print("times: ", results_graph[0])
     print()
-    print("sentiment: ", results_graph[1])
+    print("polarities: ", results_graph[1])
 
     # print()
     # print()
-    # new_dates, new_sentiment = zip(
+    # new_times, new_polarities = zip(
     #     *sorted(zip(results_graph[0], results_graph[1])))
-    # print("new_dates: ", new_dates)
+    # print("new_times: ", new_times)
     # print()
-    # print("new_sentiment: ", new_sentiment)
+    # print("new_polarities: ", new_polarities)
 
 
 if __name__ == "__main__":

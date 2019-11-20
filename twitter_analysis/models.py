@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from .sentiment import sentiment_by_keyword, sentiment_by_time
 from django.contrib.postgres.fields import ArrayField
+from random import randint
 # The Campaign Model is a user's virtual campaign
 # A user can have many Campaigns, but each Campaign only has one owner
 
@@ -16,21 +17,30 @@ class Campaign(models.Model):
 
     keyword0 = models.CharField(
         max_length=50, default='', verbose_name="Keywords")
-
     old_keyword = models.CharField(max_length=50, default='')
 
+    # polarity percentages
     positive_percent0 = models.IntegerField(default=0)
     negative_percent0 = models.IntegerField(default=0)
     neutral_percent0 = models.IntegerField(default=0)
 
+    # the total number of tweets
+    total_num_tweets = models.IntegerField(default=0)
+    total_num_pos = models.IntegerField(default=0)
+    total_num_neg = models.IntegerField(default=0)
+
+    # pos, neg, and most favorited tweet on the dashboard
     posID0 = models.CharField(max_length=70, default='')
     negID0 = models.CharField(max_length=70, default='')
+    most_favorited = models.CharField(max_length=70, default='')
 
+    # list of tweetIDs as a string
     posIDs = ArrayField(models.CharField(
         max_length=100, default=''), null=True)
     negIDs = ArrayField(models.CharField(
         max_length=100, default=''), null=True)
 
+    # times and polarities for the line chart
     times = ArrayField(models.CharField(
         max_length=100, default=''), null=True)
     polarities = ArrayField(models.CharField(
@@ -44,54 +54,132 @@ class Campaign(models.Model):
 
     def save(self, *args, **kwargs):
 
-        # resultsN[0] is positive, resultsN[1] is negative, resultsN[2] is neutral
-        numTweets = 30
-        results0 = sentiment_by_keyword(self.keyword0, numTweets)
-        self.positive_percent0 = results0[0]
-        self.negative_percent0 = results0[1]
-        self.neutral_percent0 = results0[2]
+        keywordTweetsRequested = 20
+        timeTweetsRequested = 10
 
-        if len(results0[3]) != 0:
-            self.posID0 = results0[3][0]
-
-        if len(results0[4]) != 0:
-            self.negID0 = results0[4][0]
-
-        # if the keyword has changed
         if self.old_keyword != self.keyword0:
+            keywordChanged = True
+            self.old_keyword = self.keyword0
+            # print()
+            # print("KEYWORD CHANGED")
+            # print("the new keyword is:", self.keyword0)
+            # print("the old keyword was:", self.old_keyword)
+        else:
+            keywordChanged = False
+
+        # update the total number of tweets and keyword
+        if keywordChanged:
+            oldTotal = 0
+            oldNumPos = 0
+            oldNumNeg = 0
+        else:
+            oldTotal = self.total_num_tweets
+            oldNumPos = self.total_num_pos
+            oldNumNeg = self.total_num_neg
+
+        # print("oldTotal before:", oldTotal)
+        # print("oldNumPos before:", oldNumPos)
+        # print("oldNumNeg before:", oldNumNeg)
+
+        # print()
+        # print("number of tweets requested for keyword search:",
+            #   keywordTweetsRequested)
+        keyword_results = sentiment_by_keyword(
+            self.keyword0, keywordTweetsRequested)
+
+        # update the total number of tweets
+        numNewTweets = keyword_results[5]
+        # print("number of new tweets received for keyword search:", numNewTweets)
+        # print()
+        # print("TOTAL number of tweets:",  oldTotal + numNewTweets)
+        # print()
+        self.total_num_tweets = oldTotal + numNewTweets
+
+        # update the number of positive tweets
+        numNewPos = keyword_results[3]
+        # print("number of new positive tweets:", numNewPos)
+        # print("TOTAL number of pos tweets:",  oldNumPos + numNewPos)
+        self.total_num_pos = oldNumPos + numNewPos
+
+        # update the number of negative tweets
+        numNewNeg = keyword_results[4]
+        # print("number of new negative tweets:", numNewNeg)
+        # print("TOTAL number of neg tweets:",  oldNumNeg + numNewNeg)
+        # print()
+        self.total_num_neg = oldNumNeg + numNewNeg
+
+        # update the percentages
+        posPercentage = round((oldNumPos + numNewPos) /
+                              (oldTotal + numNewTweets) * 100)
+        self.positive_percent0 = posPercentage
+
+        negPercentage = round((oldNumNeg + numNewNeg) /
+                              (oldTotal + numNewTweets) * 100)
+        self.negative_percent0 = negPercentage
+
+        self.neutral_percent0 = 100 - (posPercentage + negPercentage)
+
+        # update the 3 dashboard tweets
+        if len(keyword_results[0]) != 0:
+            self.posID0 = keyword_results[0][randint(
+                0, len(keyword_results[0]) - 1)]
+
+        if len(keyword_results[1]) != 0:
+            self.negID0 = keyword_results[1][randint(
+                0, len(keyword_results[1]) - 1)]
+
+        self.most_favorited = keyword_results[2]
+
+        # add new posIDs to list
+        if keywordChanged:
             listPos = []
         else:
-            # add new PositiveIDs to the ArrayField
             listPos = self.posIDs
 
         if listPos is None:
-            self.posIDs = results0[3]
-
+            self.posIDs = keyword_results[0]
         else:
-            listPos += results0[3]
-            print("pos: ", listPos)
+            listPos += keyword_results[0]
             self.posIDs = listPos
 
-        if self.old_keyword != self.keyword0:
+        # add new negIDs to the list
+        if keywordChanged:
             listNeg = []
-            self.old_keyword = self.keyword0
         else:
             listNeg = self.negIDs
 
         if listNeg is None:
-            self.negIDs = results0[4]
-
+            self.negIDs = keyword_results[1]
         else:
-            listNeg += results0[4]
+            listNeg += keyword_results[1]
             self.negIDs = listNeg
 
-        results_time = sentiment_by_time(self.keyword0, numTweets)
-        newTimes = self.times
-        newTimes += results_time[0]
-        self.times = newTimes
+        results_time = sentiment_by_time(
+            self.keyword0, timeTweetsRequested)
 
-        newPolarities = self.polarities
-        newPolarities += results_time[1]
-        self.polarities = newPolarities
+        # update times for the line chart
+        if keywordChanged:
+            newTimes = []
+        else:
+            newTimes = self.times
 
+        if newTimes is None:
+            self.times = results_time[0]
+        else:
+            newTimes += results_time[0]
+            self.times = newTimes
+
+        # update the polarities for the line chart
+        if keywordChanged:
+            newPolarities = []
+        else:
+            newPolarities = self.polarities
+
+        if newPolarities is None:
+            self.polarities = results_time[1]
+        else:
+            newPolarities += results_time[1]
+            self.polarities = newPolarities
+
+        # save the updated campaign
         super().save(*args, **kwargs)
