@@ -60,10 +60,6 @@ class Campaign(models.Model):
         if self.old_keyword != self.keyword0:
             keywordChanged = True
             self.old_keyword = self.keyword0
-            # print()
-            # print("KEYWORD CHANGED")
-            # print("the new keyword is:", self.keyword0)
-            # print("the old keyword was:", self.old_keyword)
         else:
             keywordChanged = False
 
@@ -77,35 +73,19 @@ class Campaign(models.Model):
             oldNumPos = self.total_num_pos
             oldNumNeg = self.total_num_neg
 
-        # print("oldTotal before:", oldTotal)
-        # print("oldNumPos before:", oldNumPos)
-        # print("oldNumNeg before:", oldNumNeg)
-
-        # print()
-        # print("number of tweets requested for keyword search:",
-            #   keywordTweetsRequested)
         keyword_results = sentiment_by_keyword(
             self.keyword0, keywordTweetsRequested)
 
         # update the total number of tweets
         numNewTweets = keyword_results[5]
-        # print("number of new tweets received for keyword search:", numNewTweets)
-        # print()
-        # print("TOTAL number of tweets:",  oldTotal + numNewTweets)
-        # print()
         self.total_num_tweets = oldTotal + numNewTweets
 
         # update the number of positive tweets
         numNewPos = keyword_results[3]
-        # print("number of new positive tweets:", numNewPos)
-        # print("TOTAL number of pos tweets:",  oldNumPos + numNewPos)
         self.total_num_pos = oldNumPos + numNewPos
 
         # update the number of negative tweets
         numNewNeg = keyword_results[4]
-        # print("number of new negative tweets:", numNewNeg)
-        # print("TOTAL number of neg tweets:",  oldNumNeg + numNewNeg)
-        # print()
         self.total_num_neg = oldNumNeg + numNewNeg
 
         # update the percentages
