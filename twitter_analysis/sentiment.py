@@ -59,27 +59,56 @@ class TwitterClient(object):
         else:
             return 'neutral', polarity
 
-    def get_tweets(self, query, count, is_popular, description):
+    def get_tweets(self, query, count, is_popular, searchType, ids):
         '''
         Main function to fetch tweets and parse them.
         '''
         # empty list to store parsed tweets
         tweets = []
+        fetched_tweets = []
 
         try:
 
-            if is_popular:
-                # call twitter api to fetch popular tweets
-                fetched_tweets = self.api.search(
-                    q=query, count=count, tweet_mode='extended', result_type='popular')
+            # search from a keyword
+            if searchType == "keyword":
+                print("keyword search")
+                if is_popular:
+                    # call twitter api to fetch popular tweets
+                    fetched_tweets = self.api.search(
+                        q=query, count=count, tweet_mode='extended', result_type='popular')
 
-            else:
-                # call twitter api to fetch recent tweets
-                fetched_tweets = self.api.search(
-                    q=query, count=count, tweet_mode='extended', result_type='recent')
+                else:
+                    # call twitter api to fetch recent tweets
+                    fetched_tweets = self.api.search(
+                        q=query, count=count, tweet_mode='extended', result_type='recent')
+
+            # search from a list of tweet IDs
+            elif searchType == "id_list":
+                print("id list search")
+
+                fetched_tweets = self.api.statuses_lookup(
+                    ids, tweet_mode='extended')
+
+            # do both
+            elif searchType == "both":
+                print("BOTH search")
+                if is_popular:
+                    # call twitter api to fetch popular tweets
+                    fetched_tweets = self.api.search(
+                        q=query, count=count, tweet_mode='extended', result_type='popular')
+
+                else:
+                    # call twitter api to fetch recent tweets
+                    fetched_tweets = self.api.search(
+                        q=query, count=count, tweet_mode='extended', result_type='recent')
+
+                fetched_tweets += self.api.statuses_lookup(
+                    ids, tweet_mode='extended')
 
             highest = 0
             highestID = ""
+
+            print("num fetched tweets:", len(fetched_tweets))
 
             # parsing tweets one by one
             for tweet in fetched_tweets:
@@ -103,7 +132,7 @@ class TwitterClient(object):
                 parsed_tweet['id'] = tweet.id_str
 
                 # save the time it was created at
-                parsed_tweet['time'] = tweet.created_at
+                parsed_tweet['time'] = str(tweet.created_at)
 
                 # appending parsed tweet to tweets list
                 if tweet.retweet_count > 0:
@@ -121,18 +150,21 @@ class TwitterClient(object):
             print("Error : " + str(e))
 
 
-def sentiment_by_keyword(string, numTweetsRequested):
+def sentiment(string, numTweetsRequested, id_list, search):
     '''
-    returns list of posIDs [0], negIDs [1], most favorited tweet [2], number of positive tweets [3], 
+    returns list of posIDs [0], negIDs [1], most favorited tweet [2], number of positive tweets [3],
     number of negative tweets [4], total number of tweets [5]. times [6], and polarities [7]
     '''
 
+    print("insdie sentimenr")
+    print("id list", id_list)
+    print("search:", search)
     # creating object of TwitterClient Class
     api = TwitterClient()
 
     # calling function to get tweets
-    tweets = api.get_tweets(query=string, count=numTweetsRequested,
-                            is_popular=True, description=True)
+    tweets = api.get_tweets(
+        query=string, count=numTweetsRequested, is_popular=True, searchType=search, ids=id_list)
 
     # picking positive tweets from tweets
     ptweets = [tweet for tweet in tweets[0]
@@ -140,9 +172,6 @@ def sentiment_by_keyword(string, numTweetsRequested):
 
     ntweets = [tweet for tweet in tweets[0]
                if tweet['sentiment'] == 'negative']
-
-    print("# of positive tweets:", len(ptweets))
-    print("# of negative tweets:", len(ntweets))
 
     pos_IDs = []
     neg_IDs = []
@@ -160,10 +189,11 @@ def sentiment_by_keyword(string, numTweetsRequested):
         times.append(tweet['time'])
         polarities.append(tweet['polarity'])
 
-    times, polarities = zip(*sorted(zip(times, polarities)))
+    # print("type time 1st:", type(times[0]))
+    # print("type polarities 1st:", type(polarities[0]))
 
-    print("len times", len(times))
-    print("len polarities", len(polarities))
+    # print("num tweets requested:", numTweetsRequested)
+    # print("num tweets returned:", len(tweets[0]))
 
     return pos_IDs, neg_IDs, tweets[1], len(ptweets), len(ntweets), len(tweets[0]), times, polarities
 
@@ -173,11 +203,14 @@ def main():
     keyword = "trump"
     count = 3
 
-    print("keyword: ", keyword)
-    print("number of tweets requested: ", count)
-    print()
+    # print("keyword: ", keyword)
+    # print("number of tweets requested: ", count)
+    # print()
 
-    results = sentiment_by_keyword(keyword, count)
+    test = [1199465061095550976, 1199739689281957888, 1199305333560229889,
+            1199096622094925827, 1197900341062381569, 1199583635155881984]
+
+    results = sentiment(keyword, count, test, "id_list")
 
     # results_graph = sentiment_by_time(keyword, count)
     # print("times: ", results_graph[0])

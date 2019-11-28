@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import Campaign
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .sentiment import sentiment_by_keyword
+from .sentiment import sentiment
 
 
 def home(request):
@@ -26,13 +26,6 @@ class CampaignListView(ListView):
         pk = self.kwargs['pk']
         context = super().get_context_data(**kwargs)
         campaign = Campaign.objects.get(id=pk)
-
-        print("campaign: ", campaign)
-        print(campaign.posIDs)
-        print(campaign.negIDs)
-
-        print("numPos tweets: ", len(campaign.posIDs))
-        print("numNeg tweets: ", len(campaign.negIDs))
 
         context['posIDs'] = campaign.posIDs
         context['negIDs'] = campaign.negIDs
