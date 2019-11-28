@@ -43,26 +43,21 @@ class TwitterClient(object):
         '''
         return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t]) |(\w+:\/\/\S+)", " ", tweet).split())
 
-    def get_tweet_sentiment(self, tweet, description):
+    def get_tweet_sentiment(self, tweet):
         '''
-        Utility function to classify polarities of passed tweet
-        using textblob's polarities method
+        word description [0], value [1]
         '''
         # create TextBlob object of passed tweet text
         analysis = TextBlob(self.clean_tweet(tweet))
         polarity = analysis.sentiment.polarity
 
-        if description:
-            # set polarities
-            if polarity > 0:
-                return 'positive'
-            elif polarity == 0:
-                return 'neutral'
-            else:
-                return 'negative'
-
+        # set polarities
+        if polarity > 0:
+            return 'positive', polarity
+        elif polarity < 0:
+            return 'negative', polarity
         else:
-            return polarity
+            return 'neutral', polarity
 
     def get_tweets(self, query, count, is_popular, description):
         '''
@@ -100,8 +95,9 @@ class TwitterClient(object):
                 parsed_tweet['text'] = tweet.full_text
 
                 # saving sentiment of tweet
-                parsed_tweet['sentiment'] = self.get_tweet_sentiment(
-                    tweet.full_text, description)
+                analysis = self.get_tweet_sentiment(tweet.full_text)
+                parsed_tweet['sentiment'] = analysis[0]
+                parsed_tweet['polarity'] = analysis[1]
 
                 # save the tweet id
                 parsed_tweet['id'] = tweet.id_str
@@ -125,33 +121,10 @@ class TwitterClient(object):
             print("Error : " + str(e))
 
 
-def sentiment_by_time(string, numTweetsRequested):
-    '''a list of times and a list of corresponding polarities'''
-
-    # creating object of TwitterClient Class
-    api = TwitterClient()
-
-    # calling function to get tweets
-    tweets = api.get_tweets(query=string, count=numTweetsRequested,
-                            is_popular=False, description=False)
-
-    times = []
-    polarities = []
-
-    # add positive polarity and time to lists
-    for tweet in tweets[0]:
-        times.append(tweet['time'])
-        polarities.append(tweet['sentiment'])
-
-    times, polarities = zip(*sorted(zip(times, polarities)))
-
-    return times, polarities
-
-
 def sentiment_by_keyword(string, numTweetsRequested):
     '''
     returns list of posIDs [0], negIDs [1], most favorited tweet [2], number of positive tweets [3], 
-    number of negative tweets [4], and total number of tweets [5]
+    number of negative tweets [4], total number of tweets [5]. times [6], and polarities [7]
     '''
 
     # creating object of TwitterClient Class
@@ -168,6 +141,9 @@ def sentiment_by_keyword(string, numTweetsRequested):
     ntweets = [tweet for tweet in tweets[0]
                if tweet['sentiment'] == 'negative']
 
+    print("# of positive tweets:", len(ptweets))
+    print("# of negative tweets:", len(ntweets))
+
     pos_IDs = []
     neg_IDs = []
 
@@ -177,7 +153,19 @@ def sentiment_by_keyword(string, numTweetsRequested):
     for tweet in ntweets:
         neg_IDs.append(tweet['id'])
 
-    return pos_IDs, neg_IDs, tweets[1], len(ptweets), len(ntweets), len(tweets[0])
+    times = []
+    polarities = []
+
+    for tweet in tweets[0]:
+        times.append(tweet['time'])
+        polarities.append(tweet['polarity'])
+
+    times, polarities = zip(*sorted(zip(times, polarities)))
+
+    print("len times", len(times))
+    print("len polarities", len(polarities))
+
+    return pos_IDs, neg_IDs, tweets[1], len(ptweets), len(ntweets), len(tweets[0]), times, polarities
 
 
 def main():
@@ -185,16 +173,16 @@ def main():
     keyword = "trump"
     count = 3
 
-    # print("keyword: ", keyword)
-    # print("number of tweets requested: ", count)
-    # print()
-
-    # results = sentiment_by_keyword(keyword, count)
-
-    results_graph = sentiment_by_time(keyword, count)
-    print("times: ", results_graph[0])
+    print("keyword: ", keyword)
+    print("number of tweets requested: ", count)
     print()
-    print("polarities: ", results_graph[1])
+
+    results = sentiment_by_keyword(keyword, count)
+
+    # results_graph = sentiment_by_time(keyword, count)
+    # print("times: ", results_graph[0])
+    # print()
+    # print("polarities: ", results_graph[1])
 
     # print()
     # print()
