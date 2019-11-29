@@ -43,48 +43,72 @@ class TwitterClient(object):
         '''
         return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t]) |(\w+:\/\/\S+)", " ", tweet).split())
 
-    def get_tweet_sentiment(self, tweet, description):
+    def get_tweet_sentiment(self, tweet):
         '''
-        Utility function to classify polarities of passed tweet
-        using textblob's polarities method
+        word description [0], value [1]
         '''
         # create TextBlob object of passed tweet text
         analysis = TextBlob(self.clean_tweet(tweet))
         polarity = analysis.sentiment.polarity
 
-        if description:
-            # set polarities
-            if polarity > 0:
-                return 'positive'
-            elif polarity == 0:
-                return 'neutral'
-            else:
-                return 'negative'
-
+        # set polarities
+        if polarity > 0:
+            return 'positive', polarity
+        elif polarity < 0:
+            return 'negative', polarity
         else:
-            return polarity
+            return 'neutral', polarity
 
-    def get_tweets(self, query, count, is_popular, description):
+    def get_tweets(self, query, count, is_popular, searchType, ids):
         '''
         Main function to fetch tweets and parse them.
         '''
         # empty list to store parsed tweets
         tweets = []
+        fetched_tweets = []
 
         try:
 
-            if is_popular:
-                # call twitter api to fetch popular tweets
-                fetched_tweets = self.api.search(
-                    q=query, count=count, tweet_mode='extended', result_type='popular')
+            # search from a keyword
+            if searchType == "keyword":
+                print("keyword search")
+                if is_popular:
+                    # call twitter api to fetch popular tweets
+                    fetched_tweets = self.api.search(
+                        q=query, count=count, tweet_mode='extended', result_type='popular')
 
-            else:
-                # call twitter api to fetch recent tweets
-                fetched_tweets = self.api.search(
-                    q=query, count=count, tweet_mode='extended', result_type='recent')
+                else:
+                    # call twitter api to fetch recent tweets
+                    fetched_tweets = self.api.search(
+                        q=query, count=count, tweet_mode='extended', result_type='recent')
+
+            # search from a list of tweet IDs
+            elif searchType == "id_list":
+                print("id list search")
+
+                fetched_tweets = self.api.statuses_lookup(
+                    ids, tweet_mode='extended')
+
+            # do both
+            elif searchType == "both":
+                print("BOTH search")
+                if is_popular:
+                    # call twitter api to fetch popular tweets
+                    fetched_tweets = self.api.search(
+                        q=query, count=count, tweet_mode='extended', result_type='popular')
+
+                else:
+                    # call twitter api to fetch recent tweets
+                    fetched_tweets = self.api.search(
+                        q=query, count=count, tweet_mode='extended', result_type='recent')
+
+                fetched_tweets += self.api.statuses_lookup(
+                    ids, tweet_mode='extended')
 
             highest = 0
             highestID = ""
+
+            print("num fetched tweets:", len(fetched_tweets))
 
             # parsing tweets one by one
             for tweet in fetched_tweets:
@@ -100,14 +124,15 @@ class TwitterClient(object):
                 parsed_tweet['text'] = tweet.full_text
 
                 # saving sentiment of tweet
-                parsed_tweet['sentiment'] = self.get_tweet_sentiment(
-                    tweet.full_text, description)
+                analysis = self.get_tweet_sentiment(tweet.full_text)
+                parsed_tweet['sentiment'] = analysis[0]
+                parsed_tweet['polarity'] = analysis[1]
 
                 # save the tweet id
                 parsed_tweet['id'] = tweet.id_str
 
                 # save the time it was created at
-                parsed_tweet['time'] = tweet.created_at
+                parsed_tweet['time'] = str(tweet.created_at)
 
                 # appending parsed tweet to tweets list
                 if tweet.retweet_count > 0:
@@ -125,41 +150,21 @@ class TwitterClient(object):
             print("Error : " + str(e))
 
 
-def sentiment_by_time(string, numTweetsRequested):
-    '''a list of times and a list of corresponding polarities'''
+def sentiment(string, numTweetsRequested, id_list, search):
+    '''
+    returns list of posIDs [0], negIDs [1], most favorited tweet [2], number of positive tweets [3],
+    number of negative tweets [4], total number of tweets [5]. times [6], and polarities [7]
+    '''
 
+    print("insdie sentimenr")
+    print("id list", id_list)
+    print("search:", search)
     # creating object of TwitterClient Class
     api = TwitterClient()
 
     # calling function to get tweets
-    tweets = api.get_tweets(query=string, count=numTweetsRequested,
-                            is_popular=False, description=False)
-
-    times = []
-    polarities = []
-
-    # add positive polarity and time to lists
-    for tweet in tweets[0]:
-        times.append(tweet['time'])
-        polarities.append(tweet['sentiment'])
-
-    times, polarities = zip(*sorted(zip(times, polarities)))
-
-    return times, polarities
-
-
-def sentiment_by_keyword(string, numTweetsRequested):
-    '''
-    returns list of posIDs [0], negIDs [1], most favorited tweet [2], number of positive tweets [3], 
-    number of negative tweets [4], and total number of tweets [5]
-    '''
-
-    # creating object of TwitterClient Class
-    api = TwitterClient()
-
-    # calling function to get tweets
-    tweets = api.get_tweets(query=string, count=numTweetsRequested,
-                            is_popular=True, description=True)
+    tweets = api.get_tweets(
+        query=string, count=numTweetsRequested, is_popular=True, searchType=search, ids=id_list)
 
     # picking positive tweets from tweets
     ptweets = [tweet for tweet in tweets[0]
@@ -177,7 +182,20 @@ def sentiment_by_keyword(string, numTweetsRequested):
     for tweet in ntweets:
         neg_IDs.append(tweet['id'])
 
-    return pos_IDs, neg_IDs, tweets[1], len(ptweets), len(ntweets), len(tweets[0])
+    times = []
+    polarities = []
+
+    for tweet in tweets[0]:
+        times.append(tweet['time'])
+        polarities.append(tweet['polarity'])
+
+    # print("type time 1st:", type(times[0]))
+    # print("type polarities 1st:", type(polarities[0]))
+
+    # print("num tweets requested:", numTweetsRequested)
+    # print("num tweets returned:", len(tweets[0]))
+
+    return pos_IDs, neg_IDs, tweets[1], len(ptweets), len(ntweets), len(tweets[0]), times, polarities
 
 
 def main():
@@ -189,12 +207,15 @@ def main():
     # print("number of tweets requested: ", count)
     # print()
 
-    # results = sentiment_by_keyword(keyword, count)
+    test = [1199465061095550976, 1199739689281957888, 1199305333560229889,
+            1199096622094925827, 1197900341062381569, 1199583635155881984]
 
-    results_graph = sentiment_by_time(keyword, count)
-    print("times: ", results_graph[0])
-    print()
-    print("polarities: ", results_graph[1])
+    results = sentiment(keyword, count, test, "id_list")
+
+    # results_graph = sentiment_by_time(keyword, count)
+    # print("times: ", results_graph[0])
+    # print()
+    # print("polarities: ", results_graph[1])
 
     # print()
     # print()

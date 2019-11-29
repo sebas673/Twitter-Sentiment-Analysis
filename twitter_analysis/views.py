@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import Campaign
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .sentiment import sentiment_by_keyword
+from .sentiment import sentiment
 
 
 def home(request):
@@ -28,13 +28,6 @@ class CampaignListView(ListView):
         context = super().get_context_data(**kwargs)
         campaign = Campaign.objects.get(id=pk)
 
-        print("campaign: ", campaign)
-        print(campaign.posIDs)
-        print(campaign.negIDs)
-
-        print("numPos tweets: ", len(campaign.posIDs))
-        print("numNeg tweets: ", len(campaign.negIDs))
-
         context['posIDs'] = campaign.posIDs
         context['negIDs'] = campaign.negIDs
         context['keyword'] = campaign.keyword0
@@ -49,7 +42,7 @@ class CampaignDetailView(DetailView):
 
 class CampaignCreateView(LoginRequiredMixin, CreateView):
     model = Campaign
-    fields = ['name', 'keyword0', 'description']
+    fields = ['name', 'keyword0', 'id_list', 'description']
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -58,7 +51,7 @@ class CampaignCreateView(LoginRequiredMixin, CreateView):
 
 class CampaignUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Campaign
-    fields = ['name', 'keyword0', 'description']
+    fields = ['name', 'keyword0', 'id_list', 'description']
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
