@@ -200,7 +200,7 @@ def sentiment(string, numTweetsRequested, id_list, search):
 
 def main():
 
-    keyword = "trump"
+    keyword = "nick viall"
     count = 3
 
     # print("keyword: ", keyword)
@@ -210,7 +210,7 @@ def main():
     test = [1199465061095550976, 1199739689281957888, 1199305333560229889,
             1199096622094925827, 1197900341062381569, 1199583635155881984]
 
-    results = sentiment(keyword, count, test, "id_list")
+    results = sentiment(keyword, count, test, "keyword")
 
     # results_graph = sentiment_by_time(keyword, count)
     # print("times: ", results_graph[0])

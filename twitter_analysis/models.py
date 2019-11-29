@@ -105,6 +105,7 @@ class Campaign(models.Model):
             oldNumNeg = 0
             self.posID0 = 0
             self.negID0 = 0
+            self.most_favorited = 0
             self.posIDs = []
             self.negIDs = []
             self.positive_percent0 = 0
@@ -156,6 +157,7 @@ class Campaign(models.Model):
             # no valid tweets were found
             # should we tell the user?
             if numNewTweets == 0:
+                super().save(*args, **kwargs)
                 return
 
             self.total_num_tweets = oldTotal + numNewTweets
