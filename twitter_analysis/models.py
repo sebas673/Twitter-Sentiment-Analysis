@@ -24,7 +24,7 @@ class Campaign(models.Model):
     id_list = models.TextField(validators=[
         validate_comma_separated_integer_list], max_length=400, blank=True, verbose_name="Tweet IDs")
     old_id_list = models.CharField(validators=[
-        validate_comma_separated_integer_list], max_length=200, blank=True)
+        validate_comma_separated_integer_list], max_length=400, blank=True)
 
     # polarity percentages
     positive_percent0 = models.IntegerField(default=0)
