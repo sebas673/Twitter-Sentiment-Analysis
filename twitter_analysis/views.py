@@ -13,7 +13,8 @@ def home(request):
         }
         return render(request, 'twitter_analysis/home.html', context)
     else:
-        return redirect('login')
+        # return redirect('login')
+        return render(request, 'twitter_analysis/homepage.html')
 
 
 class CampaignListView(ListView):

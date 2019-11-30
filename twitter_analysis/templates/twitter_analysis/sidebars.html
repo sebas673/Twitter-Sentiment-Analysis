@@ -5,7 +5,7 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
   <!-- Sidebar - Brand -->
-  <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'twitter_analysis-home' %}">
+  <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'twitter_analysis-about' %}">
     <!-- <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
           </div> -->
@@ -325,6 +325,9 @@
 
 <!-- Update Profile Form -->
 {% block profile %}{% endblock profile %}
+
+<!-- About Page -->
+{% block about %}{% endblock about %}
 
 <!-- Track Campaign Form-->
 {% block campaign %}{% endblock campaign %}
