@@ -99,7 +99,7 @@ class Campaign(models.Model):
             self.old_id_list = self.id_list
 
         # update the total number of tweets and keyword
-        if keywordChanged:
+        if keywordChanged or not self.id_list:
             oldTotal = 0
             oldNumPos = 0
             oldNumNeg = 0
